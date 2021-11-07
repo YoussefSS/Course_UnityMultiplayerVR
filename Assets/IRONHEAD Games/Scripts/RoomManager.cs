@@ -11,7 +11,8 @@ public class RoomManager : MonoBehaviourPunCallbacks
     // Start is called before the first frame update
     void Start()
     {
-        
+        PhotonNetwork.AutomaticallySyncScene = true; // Scenes will now be synchronized for all players.. ie other players will load the same game scene when they join the same room we are in. Scene will be loaded before OnJoinedRoom callback method is called
+
     }
 
     // Update is called once per frame
@@ -73,6 +74,18 @@ public class RoomManager : MonoBehaviourPunCallbacks
             {
                 // Checking to see which map we joined
                 Debug.Log("Joined room with the map: " + (string)mapType);
+
+                // We load the map based on which mapType we get from the properties
+                if((string)mapType == MultiplayerVRConstants.MAP_TYPE_VALUE_SCHOOL)
+                {
+                    // Load the school scene, since we enabled scene synchronization, other players will load the same game scene when they join the same room we are in
+                    PhotonNetwork.LoadLevel("World_School");
+                }
+                else if ((string) mapType == MultiplayerVRConstants.MAP_TYPE_VALUE_OUTDOOR)
+                {
+                    // Load outdoor scene
+                    PhotonNetwork.LoadLevel("World_Outdoor");
+                }
             }
         }
     }

@@ -5,6 +5,8 @@ using Photon.Pun;
 using Photon.Realtime;
 public class RoomManager : MonoBehaviourPunCallbacks
 {
+    private string mapType;
+
     #region Unity Methods
     // Start is called before the first frame update
     void Start()
@@ -24,6 +26,33 @@ public class RoomManager : MonoBehaviourPunCallbacks
     {
         PhotonNetwork.JoinRandomRoom();
     }
+
+    public void OnEnterButtonClicked_OutDoor() // Check the school function for documentations
+    {
+        mapType = MultiplayerVRConstants.MAP_TYPE_VALUE_OUTDOOR;
+
+        ExitGames.Client.Photon.Hashtable expectedCustomRoomProperties = new ExitGames.Client.Photon.Hashtable() { { MultiplayerVRConstants.MAP_TYPE_KEY, mapType } };
+        
+        PhotonNetwork.JoinRandomRoom(expectedCustomRoomProperties, 0); 
+    }
+
+    public void OnEnterButtonClicked_School()
+    {
+        mapType = MultiplayerVRConstants.MAP_TYPE_VALUE_SCHOOL;
+
+        /* Documentation https://doc.photonengine.com/en-us/realtime/current/lobby-and-matchmaking/matchmaking-and-lobby
+        * Under Filtering Room Properties In Join Random
+        * */
+        ExitGames.Client.Photon.Hashtable expectedCustomRoomProperties = new ExitGames.Client.Photon.Hashtable() { {MultiplayerVRConstants.MAP_TYPE_KEY, mapType } };
+
+        /* Documentation https://doc-api.photonengine.com/en/pun/v2/class_photon_1_1_pun_1_1_photon_network.html#a497af0481f21c6a4647b886989e63a32
+         * */
+        PhotonNetwork.JoinRandomRoom(expectedCustomRoomProperties, 0); // 0 means any max player value
+    }
+    #endregion
+
+
+    #region Photon Callback Methods
 
     public override void OnCreatedRoom() // Called by Photon when a room is created
     {
@@ -57,19 +86,19 @@ public class RoomManager : MonoBehaviourPunCallbacks
     {
         Debug.Log(newPlayer.NickName + " joined to: " + PhotonNetwork.CurrentRoom.Name + " Player count: " + PhotonNetwork.CurrentRoom.PlayerCount);
     }
-    #endregion
 
-
-    #region Photon Callback Methods
     public override void OnJoinRandomFailed(short returnCode, string message)
     {
         Debug.Log(message);
         CreateAndJoinRoom();
     }
+
+
     #endregion
 
 
     #region Private Methods
+
     private void CreateAndJoinRoom()
     {
         string randomRoomName = "Room_" + Random.Range(0, 10000);
@@ -88,12 +117,14 @@ public class RoomManager : MonoBehaviourPunCallbacks
          * 2. School = "school"
          * We set them up in a custom script we created called MultiplayerVRConstants
          * */
-        ExitGames.Client.Photon.Hashtable customRoomProperties = new ExitGames.Client.Photon.Hashtable() { {MultiplayerVRConstants.MAP_TYPE_KEY, MultiplayerVRConstants.MAP_TYPE_VALUE_SCHOOL } };// We use this instead of regular hashtable for some reason. We set school just for testing purposes
+        ExitGames.Client.Photon.Hashtable customRoomProperties = new ExitGames.Client.Photon.Hashtable() { {MultiplayerVRConstants.MAP_TYPE_KEY, mapType } }; // mapType is set in OnEnterButtonClicked functions
         roomOptions.CustomRoomPropertiesForLobby = roomPropsInLobby; // this will set the room properties that will be shown in the lobby
         roomOptions.CustomRoomProperties = customRoomProperties; // This is where we can set properties for our room
 
 
         PhotonNetwork.CreateRoom(randomRoomName, roomOptions); // We can also specify lobby but it is already created in the room creation/joining process
     }
+
+
     #endregion
 }

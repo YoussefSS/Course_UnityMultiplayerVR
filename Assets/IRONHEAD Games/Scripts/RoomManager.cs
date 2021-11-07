@@ -36,6 +36,16 @@ public class RoomManager : MonoBehaviourPunCallbacks
     public override void OnJoinedRoom() 
     {
         Debug.Log("The local player : " + PhotonNetwork.NickName + " joined to " + PhotonNetwork.CurrentRoom.Name + " Player count: " + PhotonNetwork.CurrentRoom.PlayerCount);
+
+        if(PhotonNetwork.CurrentRoom.CustomProperties.ContainsKey(MultiplayerVRConstants.MAP_TYPE_KEY))
+        {
+            object mapType;
+            if(PhotonNetwork.CurrentRoom.CustomProperties.TryGetValue(MultiplayerVRConstants.MAP_TYPE_KEY,out mapType)) // Try get value takes key and has a object type as output
+            {
+                // Checking to see which map we joined
+                Debug.Log("Joined room with the map: " + (string)mapType);
+            }
+        }
     }
 
     /*
@@ -65,6 +75,23 @@ public class RoomManager : MonoBehaviourPunCallbacks
         string randomRoomName = "Room_" + Random.Range(0, 10000);
         RoomOptions roomOptions = new RoomOptions(); // Needed as input parameter for PhotonNetwork.CreateRoom
         roomOptions.MaxPlayers = 20; // max players is in bytes so keep that in mind
+
+        /* props means properties
+         * A Lobby is where photon organizes the rooms
+         * There are 3 types of lobbies.. default, SQL and async. We will use default
+         * explained here https://doc.photonengine.com/en-us/realtime/current/lobby-and-matchmaking/matchmaking-and-lobby under Exposing Some Properties In The Lobby
+         * */
+        string[] roomPropsInLobby = { MultiplayerVRConstants.MAP_TYPE_KEY };
+
+        /* We have to different maps
+         * 1. Outdoor = "outdoor"
+         * 2. School = "school"
+         * We set them up in a custom script we created called MultiplayerVRConstants
+         * */
+        ExitGames.Client.Photon.Hashtable customRoomProperties = new ExitGames.Client.Photon.Hashtable() { {MultiplayerVRConstants.MAP_TYPE_KEY, MultiplayerVRConstants.MAP_TYPE_VALUE_SCHOOL } };// We use this instead of regular hashtable for some reason. We set school just for testing purposes
+        roomOptions.CustomRoomPropertiesForLobby = roomPropsInLobby; // this will set the room properties that will be shown in the lobby
+        roomOptions.CustomRoomProperties = customRoomProperties; // This is where we can set properties for our room
+
 
         PhotonNetwork.CreateRoom(randomRoomName, roomOptions); // We can also specify lobby but it is already created in the room creation/joining process
     }

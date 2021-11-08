@@ -3,15 +3,25 @@ using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
+using TMPro;
+
 public class RoomManager : MonoBehaviourPunCallbacks
 {
     private string mapType;
+
+    public TextMeshProUGUI OccupancyRateText_ForSchool;
+    public TextMeshProUGUI OccupancyRateText_ForOutdoor;
 
     #region Unity Methods
     // Start is called before the first frame update
     void Start()
     {
         PhotonNetwork.AutomaticallySyncScene = true; // Scenes will now be synchronized for all players.. ie other players will load the same game scene when they join the same room we are in. Scene will be loaded before OnJoinedRoom callback method is called
+
+        if(PhotonNetwork.IsConnectedAndReady) // This is how we check if we are connected to the servers or not
+        {
+            PhotonNetwork.JoinLobby(); // Join the default lobby, we need this for OnRoomListUpdate
+        }
 
     }
 
@@ -100,12 +110,50 @@ public class RoomManager : MonoBehaviourPunCallbacks
         Debug.Log(newPlayer.NickName + " joined to: " + PhotonNetwork.CurrentRoom.Name + " Player count: " + PhotonNetwork.CurrentRoom.PlayerCount);
     }
 
+    /*
+     * Called when someone joins / creates room or changes room properties
+     * Called while in a lobby, so we need to connect to the default lobby to get the room list updates, we do that in the Start method
+     */
+    public override void OnRoomListUpdate(List<RoomInfo> roomList)
+    {
+        if(roomList.Count == 0)
+        {
+            // There is no room at all
+            OccupancyRateText_ForSchool.text = 0 + "/" + 20;
+            OccupancyRateText_ForOutdoor.text = 0 + "/" + 20;
+        }
+
+        foreach(RoomInfo room in roomList)
+        {
+            Debug.Log(room.Name);
+
+            // We cannot access the custom properties of a room if we are not inside that room, we can only access the CustomRoomPropertiesForLobby, but that only contains the map key, and does not tell us the map value
+
+            if(room.Name.Contains(MultiplayerVRConstants.MAP_TYPE_VALUE_OUTDOOR))
+            {
+                // Update the outdoor room occupancy field
+                Debug.Log("Room is a Outdoor map. Player count is: " + room.PlayerCount);
+                OccupancyRateText_ForOutdoor.text = room.PlayerCount + "/" + 20;
+            }
+            else if(room.Name.Contains(MultiplayerVRConstants.MAP_TYPE_VALUE_SCHOOL))
+            {
+                // Update the school room occupancy field
+                Debug.Log("Room is a School map. Player count is: " + room.PlayerCount);
+                OccupancyRateText_ForSchool.text = room.PlayerCount + "/" + 20;
+            }
+        }
+    }
+
     public override void OnJoinRandomFailed(short returnCode, string message)
     {
         Debug.Log(message);
         CreateAndJoinRoom();
     }
 
+    public override void OnJoinedLobby()
+    {
+        Debug.Log("Joined the Lobby.");
+    }
 
     #endregion
 
@@ -114,7 +162,7 @@ public class RoomManager : MonoBehaviourPunCallbacks
 
     private void CreateAndJoinRoom()
     {
-        string randomRoomName = "Room_" + Random.Range(0, 10000);
+        string randomRoomName = "Room_" + mapType + Random.Range(0, 10000);
         RoomOptions roomOptions = new RoomOptions(); // Needed as input parameter for PhotonNetwork.CreateRoom
         roomOptions.MaxPlayers = 20; // max players is in bytes so keep that in mind
 

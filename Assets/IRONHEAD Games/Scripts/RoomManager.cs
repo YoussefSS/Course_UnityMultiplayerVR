@@ -18,9 +18,13 @@ public class RoomManager : MonoBehaviourPunCallbacks
     {
         PhotonNetwork.AutomaticallySyncScene = true; // Scenes will now be synchronized for all players.. ie other players will load the same game scene when they join the same room we are in. Scene will be loaded before OnJoinedRoom callback method is called
 
-        if(PhotonNetwork.IsConnectedAndReady) // This is how we check if we are connected to the servers or not
+        if(!PhotonNetwork.IsConnectedAndReady) // This is how we check if we are connected to the servers or not
         {
-            PhotonNetwork.JoinLobby(); // Join the default lobby, we need this for OnRoomListUpdate
+            PhotonNetwork.ConnectUsingSettings();
+        }
+        else
+        {
+            PhotonNetwork.JoinLobby();
         }
 
     }
@@ -148,6 +152,12 @@ public class RoomManager : MonoBehaviourPunCallbacks
     {
         Debug.Log(message);
         CreateAndJoinRoom();
+    }
+
+    public override void OnConnectedToMaster()
+    {
+        Debug.Log("Connected to servers again");
+        PhotonNetwork.JoinLobby();
     }
 
     public override void OnJoinedLobby()

@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
+using UnityEngine.XR.Interaction.Toolkit;
 
 public class PlayerNetworkSetup : MonoBehaviourPunCallbacks
 {
@@ -30,6 +31,16 @@ public class PlayerNetworkSetup : MonoBehaviourPunCallbacks
             // If photonview is mine, I will set the avatar head and body to local
             SetLayerRecursively(AvatarHeadGameobject,6); // 6 is the LocalAvatarHead layer number in the unity layers
             SetLayerRecursively(AvatarBodyGameobject,7); // 6 is the LocalAvatarBody
+
+            TeleportationArea[] teleportationAreas = GameObject.FindObjectsOfType<TeleportationArea>();
+            if(teleportationAreas.Length > 0)
+            {
+                Debug.Log("Found " + teleportationAreas.Length + " teleporation area. ");
+                foreach(var item in teleportationAreas)
+                {
+                    item.teleportationProvider = LocalXRRigGameobject.GetComponent<TeleportationProvider>();
+                }
+            }
 
         }
         else // Photonview is not mine, so the player is the remote player

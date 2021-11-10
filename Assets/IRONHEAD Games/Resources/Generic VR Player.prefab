@@ -1926,7 +1926,7 @@ GameObject:
   - component: {fileID: 2549648995744548635}
   - component: {fileID: 3086044760923843030}
   - component: {fileID: 2639540912431150150}
-  - component: {fileID: 4403921571694543930}
+  - component: {fileID: 3036709459417112526}
   m_Layer: 0
   m_Name: Generic VR Player
   m_TagString: Untagged
@@ -1969,7 +1969,7 @@ MonoBehaviour:
   OwnershipTransfer: 0
   observableSearch: 0
   ObservedComponents:
-  - {fileID: 4403921571694543930}
+  - {fileID: 3036709459417112526}
   sceneViewId: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
@@ -1988,7 +1988,7 @@ MonoBehaviour:
   LocalXRRigGameobject: {fileID: 7096255362642070161}
   AvatarHeadGameobject: {fileID: 3876434581630042752}
   AvatarBodyGameobject: {fileID: 8076362737169909258}
---- !u!114 &4403921571694543930
+--- !u!114 &3036709459417112526
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1997,13 +1997,15 @@ MonoBehaviour:
   m_GameObject: {fileID: 8861885498113626337}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 627855c7f81362d41938ffe0b1475957, type: 3}
+  m_Script: {fileID: 11500000, guid: 4555a245ad05e3d4cbbe73c7ed5e3599, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_SynchronizePosition: 1
-  m_SynchronizeRotation: 1
-  m_SynchronizeScale: 0
-  m_UseLocal: 1
+  generalVRPlayerTransform: {fileID: 2549648995744548635}
+  mainAvatarTransform: {fileID: 4980112311798647756}
+  headTransform: {fileID: 4733242257675907832}
+  bodyTransform: {fileID: 5754939217026436252}
+  leftHandTransform: {fileID: 7241628672801004736}
+  rightHandTransform: {fileID: 6305620338394315675}
 --- !u!1001 &3436784826426542805
 PrefabInstance:
   m_ObjectHideFlags: 0

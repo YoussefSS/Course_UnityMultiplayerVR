@@ -10,7 +10,8 @@ public class PlayerNetworkSetup : MonoBehaviourPunCallbacks
 
     public GameObject AvatarHeadGameobject;
     public GameObject AvatarBodyGameobject;
-
+    
+    public GameObject[] AvatarModelPrefabs;
     // Start is called before the first frame update
     void Start()
     {
@@ -27,6 +28,15 @@ public class PlayerNetworkSetup : MonoBehaviourPunCallbacks
             // If IsMine, then this player is actually me, meaning it is the local player
             // If the player is local, we will keep the XR Rig active in the scene, if not we will disable it (in GenericVRPlayer)
             LocalXRRigGameobject.SetActive(true);
+
+            // Getting the Avatar Selection data so that the correct avatar model can be instantiated
+            object avatarSelectionNumber;
+            if(PhotonNetwork.LocalPlayer.CustomProperties.TryGetValue(MultiplayerVRConstants.AVATAR_SELECTION_NUMBER, out avatarSelectionNumber)) // Getting the value
+            {
+                Debug.Log("Avatar selection number: " + (int)avatarSelectionNumber);
+                photonView.RPC("InitializeSelectedAvatarModel", RpcTarget.AllBuffered, (int)avatarSelectionNumber);
+            }
+
 
             // If photonview is mine, I will set the avatar head and body to local
             SetLayerRecursively(AvatarHeadGameobject,6); // 6 is the LocalAvatarHead layer number in the unity layers
@@ -71,4 +81,23 @@ public class PlayerNetworkSetup : MonoBehaviourPunCallbacks
         }
     }
 
+    [PunRPC]
+    public void InitializeSelectedAvatarModel(int avatarSelectionNumber)
+    {
+        GameObject selectedAvatarGameobject = Instantiate(AvatarModelPrefabs[avatarSelectionNumber], LocalXRRigGameobject.transform);
+
+        AvatarInputConverter avatarInputConverter = LocalXRRigGameobject.GetComponent<AvatarInputConverter>();
+        AvatarHolder avatarHolder = selectedAvatarGameobject.GetComponent<AvatarHolder>();
+        SetUpAvatarGameobject(avatarHolder.HeadTransform, avatarInputConverter.AvatarHead);
+        SetUpAvatarGameobject(avatarHolder.BodyTransform, avatarInputConverter.AvatarBody);
+        SetUpAvatarGameobject(avatarHolder.HandLeftTransform, avatarInputConverter.AvatarHand_Left);
+        SetUpAvatarGameobject(avatarHolder.HandRightTransform, avatarInputConverter.AvatarHand_Right);
+    }
+
+    void SetUpAvatarGameobject(Transform avatarModelTransform, Transform mainAvatarTransform)
+    {
+        avatarModelTransform.SetParent(mainAvatarTransform);
+        avatarModelTransform.localPosition = Vector3.zero;
+        avatarModelTransform.localRotation = Quaternion.identity;
+    }
 }

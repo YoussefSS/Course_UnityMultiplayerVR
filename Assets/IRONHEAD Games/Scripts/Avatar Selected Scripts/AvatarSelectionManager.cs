@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Photon.Pun;
 
 public class AvatarSelectionManager : MonoBehaviour
 {
@@ -38,19 +39,20 @@ public class AvatarSelectionManager : MonoBehaviour
         ////Initially, de-activating the Avatar Selection Platform.
         //AvatarSelectionPlatformGameobject.SetActive(false);
 
+        // The next part is supposed to be in this lecture
         object storedAvatarSelectionNumber;
-        if (PhotonNetwork.LocalPlayer.CustomProperties.TryGetValue(MultiplayerVRConstants.AVATAR_SELECTION_NUMBER, out storedAvatarSelectionNumber))
+        if (PhotonNetwork.LocalPlayer.CustomProperties.TryGetValue(MultiplayerVRConstants.AVATAR_SELECTION_NUMBER, out storedAvatarSelectionNumber)) //
         {
             Debug.Log("Stored avatar selection number: "+ (int)storedAvatarSelectionNumber);
-            avatarSelectionNumber = (int)storedAvatarSelectionNumber;
-            ActivateAvatarModelAt(avatarSelectionNumber);
-            LoadAvatarModelAt(avatarSelectionNumber);
+            avatarSelectionNumber = (int)storedAvatarSelectionNumber; //
+            ActivateAvatarModelAt(avatarSelectionNumber); //
+            LoadAvatarModelAt(avatarSelectionNumber);   //
         }
-        else
+        else //
         {
-            avatarSelectionNumber = 0;
-            ActivateAvatarModelAt(avatarSelectionNumber);
-            LoadAvatarModelAt(avatarSelectionNumber);
+            avatarSelectionNumber = 0; //
+            ActivateAvatarModelAt(avatarSelectionNumber); //
+            LoadAvatarModelAt(avatarSelectionNumber); //
         }
 
        
@@ -127,7 +129,8 @@ public class AvatarSelectionManager : MonoBehaviour
         avatarInputConverter.AvatarHand_Left = loadableAvatarModels[avatarIndex].GetComponent<AvatarHolder>().HandLeftTransform;
         avatarInputConverter.AvatarHand_Right = loadableAvatarModels[avatarIndex].GetComponent<AvatarHolder>().HandRightTransform;
 
-        ExitGames.Client.Photon.Hashtable playerSelectionProp = new ExitGames.Client.Photon.Hashtable() { {MultiplayerVRConstants.AVATAR_SELECTION_NUMBER,avatarSelectionNumber } };
-        PhotonNetwork.LocalPlayer.SetCustomProperties(playerSelectionProp);
+        // The next 2 lines of code should've been in this lecture and not the previous one
+        ExitGames.Client.Photon.Hashtable playerSelectionProp = new ExitGames.Client.Photon.Hashtable() { {MultiplayerVRConstants.AVATAR_SELECTION_NUMBER,avatarSelectionNumber } }; // We set the AVATAR_SELECTION_NUMBER property to the avatarSelectionNumber integer
+        PhotonNetwork.LocalPlayer.SetCustomProperties(playerSelectionProp); // We set the property
     }
 }

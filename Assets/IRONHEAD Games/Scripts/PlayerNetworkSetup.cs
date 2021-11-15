@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
 using UnityEngine.XR.Interaction.Toolkit;
+using TMPro;
 
 public class PlayerNetworkSetup : MonoBehaviourPunCallbacks
 {
@@ -13,6 +14,9 @@ public class PlayerNetworkSetup : MonoBehaviourPunCallbacks
     public GameObject AvatarBodyGameobject;
     
     public GameObject[] AvatarModelPrefabs;
+
+    public TextMeshProUGUI PlayerName_Text;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -64,6 +68,11 @@ public class PlayerNetworkSetup : MonoBehaviourPunCallbacks
             // If the player is remote, set its avatar to the default layer
             SetLayerRecursively(AvatarHeadGameobject, 0); 
             SetLayerRecursively(AvatarBodyGameobject, 0); 
+        }
+
+        if(PlayerName_Text != null)
+        {
+            PlayerName_Text.text = photonView.Owner.NickName;
         }
     }
 
